@@ -4,6 +4,8 @@ import MainLayout from "../Layout/MainLayout";
 import HomePages from "../pages/HomePages";
 import AboutPages from "../pages/AboutPages";
 import ProfilePages from "../pages/ProfilePages";
+import Register from "../pages/Register";
+import SingIn from "../pages/SingIn";
 
 
 
@@ -25,6 +27,14 @@ export const router = createBrowserRouter([
         {
             path:"/profile",
             element: <ProfilePages></ProfilePages>,
+        },
+        {
+            path:"/register",
+            element: <Register></Register>,
+        },
+        {
+            path:"/sing_in",
+            element: <SingIn></SingIn>,
         },
     ]
   },
