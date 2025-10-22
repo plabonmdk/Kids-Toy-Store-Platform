@@ -3,7 +3,11 @@ import { Link } from "react-router";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { auth } from "../firebase/FirebaseConfig";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import Swal from "sweetalert2";
 
 const Register = () => {
@@ -12,28 +16,65 @@ const Register = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     const form = e.target;
-    const name = form.name.value;
-    const photo = form.photo.value;
-    const email = form.email.value;
+    const name = form.name.value.trim();
+    const photo = form.photo.value.trim();
+    const email = form.email.value.trim();
     const password = form.password.value;
 
+    // ✅ Password validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Weak Password",
+        html: `
+          Password must meet the following rules:<br/>
+          - Minimum 8 characters<br/>
+          - At least 1 uppercase letter<br/>
+          - At least 1 lowercase letter<br/>
+          - At least 1 number<br/>
+          - At least 1 special character (@$!%*?&)
+        `,
+        confirmButtonColor: "#f59e0b",
+      });
+      return;
+    }
+
+    // ✅ Firebase registration
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        
+
+        // ✅ Update profile info
         updateProfile(user, {
           displayName: name,
           photoURL: photo,
         })
           .then(() => {
-            Swal.fire({
-              icon: "success",
-              title: "Registration Successful",
-              text: `Welcome ${name}!`,
-              timer: 2000,
-              showConfirmButton: false,
-            });
-            form.reset();
+            // ✅ Send email verification
+            sendEmailVerification(user)
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  title: "Registration Successful!",
+                  html: `
+                    <b>Welcome, ${name}!</b><br/>
+                    A verification email has been sent to <b>${email}</b>.<br/>
+                    Please check your inbox or spam folder to verify your account.
+                  `,
+                  confirmButtonColor: "#4f46e5",
+                });
+                form.reset();
+              })
+              .catch((err) => {
+                Swal.fire({
+                  icon: "error",
+                  title: "Email Verification Failed",
+                  text: err.message,
+                });
+              });
           })
           .catch((err) => {
             Swal.fire({
@@ -68,6 +109,7 @@ const Register = () => {
         </p>
 
         <form onSubmit={handleRegister}>
+          {/* Name */}
           <div className="form-control mb-3">
             <label className="label">
               <span className="label-text text-white font-medium">
@@ -83,6 +125,7 @@ const Register = () => {
             />
           </div>
 
+          {/* Photo URL */}
           <div className="form-control mb-3">
             <label className="label">
               <span className="label-text text-white font-medium">
@@ -97,6 +140,7 @@ const Register = () => {
             />
           </div>
 
+          {/* Email */}
           <div className="form-control mb-3">
             <label className="label">
               <span className="label-text text-white font-medium">Email</span>
@@ -110,9 +154,12 @@ const Register = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="form-control mb-4 relative">
             <label className="label">
-              <span className="label-text text-white font-medium">Password</span>
+              <span className="label-text text-white font-medium">
+                Password
+              </span>
             </label>
             <input
               type={show ? "text" : "password"}
@@ -129,6 +176,7 @@ const Register = () => {
             </div>
           </div>
 
+          {/* Submit Button */}
           <button className="btn bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-700 hover:to-pink-600 w-full mt-2 text-white font-semibold border-none">
             Register
           </button>
@@ -137,7 +185,7 @@ const Register = () => {
         <p className="text-center text-sm text-gray-200 mt-5">
           Already have an account?{" "}
           <Link
-            to="/sign_in"
+            to="/sing_in"
             className="link link-hover text-yellow-300 font-medium"
           >
             Login here

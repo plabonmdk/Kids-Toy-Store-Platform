@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/FirebaseConfig";
 import Swal from "sweetalert2";
+import { FaUserCircle } from "react-icons/fa"; // 👤 Profile icon
 import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
 
 const Navbar = () => {
@@ -70,14 +71,23 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow"
             >
               <li>
-                <NavLink to="/" className={navLinkStyle}>Home</NavLink>
+                <NavLink to="/" className={navLinkStyle}>
+                  Home
+                </NavLink>
               </li>
               <li>
-                <NavLink to="/about" className={navLinkStyle}>About</NavLink>
+                <NavLink to="/about" className={navLinkStyle}>
+                  About
+                </NavLink>
               </li>
-              <li>
-                <NavLink to="/profile" className={navLinkStyle}>Profile</NavLink>
-              </li>
+              {/* ✅ Profile only when logged in */}
+              {user && (
+                <li>
+                  <NavLink to="/profile" className={navLinkStyle}>
+                    Profile
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -95,28 +105,43 @@ const Navbar = () => {
         <div className="navbar-center hidden md:flex">
           <ul className="menu menu-horizontal px-1 gap-6 text-base">
             <li>
-              <NavLink to="/" className={navLinkStyle}>Home</NavLink>
+              <NavLink to="/" className={navLinkStyle}>
+                Home
+              </NavLink>
             </li>
             <li>
-              <NavLink to="/about" className={navLinkStyle}>About</NavLink>
+              <NavLink to="/about" className={navLinkStyle}>
+                About
+              </NavLink>
             </li>
-            <li>
-              <NavLink to="/profile" className={navLinkStyle}>Profile</NavLink>
-            </li>
+            {/* ✅ Show profile only when user logged in */}
+            {user && (
+              <li>
+                <NavLink to="/profile" className={navLinkStyle}>
+                  Profile
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
 
         {/* Navbar End */}
-        <div className="navbar-end">
+        <div className="navbar-end flex items-center gap-3">
           {user ? (
-            <button
-              onClick={handleLogout}
-              className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 
-                         hover:from-pink-600 hover:to-red-500 transition-all duration-300
-                         px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
-            >
-              Logout
-            </button>
+            <>
+              {/* 👤 Profile icon next to Logout */}
+              <NavLink to="/profile" className="text-4xl text-gray-700  hover:text-blue-600">
+                <FaUserCircle />
+              </NavLink>
+              <button
+                onClick={handleLogout}
+                className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 
+                           hover:from-pink-600 hover:to-red-500 transition-all duration-300
+                           px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <NavLink
               to="/sing_in"

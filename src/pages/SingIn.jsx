@@ -1,8 +1,10 @@
-import { 
-  signInWithEmailAndPassword, 
-  signInWithPopup, 
-  signOut, 
-  GoogleAuthProvider 
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import React, { useState } from "react";
 import { Link } from "react-router";
@@ -12,11 +14,14 @@ import bgImage from "../assets/colorful-toys-scattered-around-blue-background-wi
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
 
 const SignIn = () => {
   const [user, setUser] = useState(null);
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
 
+  // 🔹 Google Sign In
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, googleProvider)
       .then((res) => {
@@ -38,10 +43,63 @@ const SignIn = () => {
       });
   };
 
+  // 🔹 Github Sign In
+  const handleGithubSignIn = () => {
+    signInWithPopup(auth, githubProvider)
+      .then((res) => {
+        setUser(res.user);
+        Swal.fire({
+          icon: "success",
+          title: "Signed In with GitHub!",
+          text: `Welcome, ${res.user.displayName || "User"}`,
+          confirmButtonColor: "#6366f1",
+        });
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: err.message,
+          confirmButtonColor: "#ef4444",
+        });
+      });
+  };
+
+  // 🔹 Forgot Password (Reset Email)
+  const handleForgetPassword = async () => {
+    if (!email) {
+      Swal.fire({
+        icon: "warning",
+        title: "Email Required",
+        text: "Please enter your email address first!",
+        confirmButtonColor: "#f59e0b",
+      });
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Swal.fire({
+        icon: "success",
+        title: "Password Reset Sent!",
+        text: "Check your inbox for reset instructions.",
+        confirmButtonColor: "#6366f1",
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message,
+        confirmButtonColor: "#ef4444",
+      });
+    }
+  };
+
+  // 🔹 Email/Password Sign In
   const handleSignIn = (e) => {
     e.preventDefault();
     const form = e.target;
-    const email = form.email.value.trim();
+    const emailValue = form.email.value.trim();
     const password = form.password.value;
 
     const passwordRegex =
@@ -57,14 +115,24 @@ const SignIn = () => {
           - At least 1 uppercase letter<br/>
           - At least 1 lowercase letter<br/>
           - At least 1 number<br/>
-          - At least 1 special character (@$!%*?&)`,
+          - At least 1 special character (@$!%*?&)
+        `,
         confirmButtonColor: "#f59e0b",
       });
       return;
     }
 
-    signInWithEmailAndPassword(auth, email, password)
+    signInWithEmailAndPassword(auth, emailValue, password)
       .then((res) => {
+        if (!res.user.emailVerified) {
+          Swal.fire({
+            icon: "warning",
+            title: "Email Not Verified",
+            text: "Please verify your email before signing in.",
+            confirmButtonColor: "#f59e0b",
+          });
+          return;
+        }
         setUser(res.user);
         Swal.fire({
           icon: "success",
@@ -84,6 +152,7 @@ const SignIn = () => {
       });
   };
 
+  // 🔹 Sign Out
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
@@ -104,6 +173,7 @@ const SignIn = () => {
       });
   };
 
+  // 🔹 UI
   return (
     <div
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -130,7 +200,9 @@ const SignIn = () => {
               alt="User Avatar"
               className="mx-auto mt-3 w-20 h-20 rounded-full"
             />
-            <h2 className="text-xl font-semibold">{user?.displayName}</h2>
+            <h2 className="text-xl font-semibold text-white">
+              {user?.displayName || "Anonymous User"}
+            </h2>
 
             <button
               onClick={handleSignOut}
@@ -144,6 +216,7 @@ const SignIn = () => {
             <p className="text-center text-gray-200 mb-6">
               Sign in to continue to your account
             </p>
+
             <form onSubmit={handleSignIn} className="space-y-4">
               <div>
                 <label className="block text-gray-100 mb-1">Email</label>
@@ -151,6 +224,7 @@ const SignIn = () => {
                   type="email"
                   name="email"
                   placeholder="Enter your email"
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full p-3 rounded-lg bg-white/80 text-gray-900 outline-none focus:ring-2 focus:ring-indigo-400"
                   required
                 />
@@ -173,16 +247,20 @@ const SignIn = () => {
                 </div>
 
                 <div className="text-right mt-1">
-                  <a
-                    href="#"
+                  <button
+                    type="button"
+                    onClick={handleForgetPassword}
                     className="text-sm font-semibold text-indigo-300 hover:text-indigo-400"
                   >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-pink-600 transition-all duration-300">
+              <button
+                type="submit"
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-pink-600 transition-all duration-300"
+              >
                 Sign In
               </button>
             </form>
@@ -195,7 +273,7 @@ const SignIn = () => {
 
             <button
               onClick={handleGoogleSignIn}
-              className="btn btn-outline w-full mb-2 bg-white/70 hover:bg-white flex justify-center items-center gap-2"
+              className="w-full mb-2 bg-white/70 hover:bg-white flex justify-center items-center gap-2 py-2 rounded-lg shadow"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
@@ -205,7 +283,10 @@ const SignIn = () => {
               Continue with Google
             </button>
 
-            <button className="btn btn-outline w-full bg-white/70 hover:bg-white flex justify-center items-center gap-2">
+            <button
+              onClick={handleGithubSignIn}
+              className="w-full bg-white/70 hover:bg-white flex justify-center items-center gap-2 py-2 rounded-lg shadow"
+            >
               <img
                 src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
                 alt="Github"
