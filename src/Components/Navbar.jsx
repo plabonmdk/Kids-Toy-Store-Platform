@@ -1,8 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase/FirebaseConfig";
+import Swal from "sweetalert2";
 import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
 
 const Navbar = () => {
+  const [user, setUser] = useState(null);
+
+  // ✅ Firebase auth state listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ✅ Logout function
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      Swal.fire({
+        icon: "success",
+        title: "Logged out successfully!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Logout failed",
+        text: error.message,
+      });
+    }
+  };
+
+  // ✅ Active link style
   const navLinkStyle = ({ isActive }) =>
     isActive
       ? "text-blue-600 font-semibold border-b-2 border-blue-600"
@@ -10,11 +43,9 @@ const Navbar = () => {
 
   return (
     <div className="bg-base-100 shadow-sm w-full">
-      {/* container centers everything inside */}
       <div className="navbar container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         {/* Navbar Start */}
         <div className="navbar-start">
-          {/* Mobile Dropdown */}
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-ghost lg:hidden">
               <svg
@@ -60,7 +91,7 @@ const Navbar = () => {
           </NavLink>
         </div>
 
-        {/* Navbar Center (Visible on md+) */}
+        {/* Navbar Center */}
         <div className="navbar-center hidden md:flex">
           <ul className="menu menu-horizontal px-1 gap-6 text-base">
             <li>
@@ -77,14 +108,25 @@ const Navbar = () => {
 
         {/* Navbar End */}
         <div className="navbar-end">
-          <NavLink
-            to="/sing_in"
-            className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
-                       hover:from-indigo-600 hover:to-blue-500 transition-all duration-300
-                       px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
-          >
-            Sign In
-          </NavLink>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 
+                         hover:from-pink-600 hover:to-red-500 transition-all duration-300
+                         px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
+            >
+              Logout
+            </button>
+          ) : (
+            <NavLink
+              to="/sing_in"
+              className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
+                         hover:from-indigo-600 hover:to-blue-500 transition-all duration-300
+                         px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
+            >
+              Sign In
+            </NavLink>
+          )}
         </div>
       </div>
     </div>

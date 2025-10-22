@@ -1,97 +1,233 @@
-import React from "react";
+import { 
+  signInWithEmailAndPassword, 
+  signInWithPopup, 
+  signOut, 
+  GoogleAuthProvider 
+} from "firebase/auth";
+import React, { useState } from "react";
 import { Link } from "react-router";
+import { auth } from "../firebase/FirebaseConfig";
+import Swal from "sweetalert2";
+import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
-const SingIn = () => {
+const googleProvider = new GoogleAuthProvider();
+
+const SignIn = () => {
+  const [user, setUser] = useState(null);
+  const [show, setShow] = useState(false);
+
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((res) => {
+        setUser(res.user);
+        Swal.fire({
+          icon: "success",
+          title: "Signed In with Google!",
+          text: `Welcome, ${res.user.displayName}`,
+          confirmButtonColor: "#6366f1",
+        });
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: err.message,
+          confirmButtonColor: "#ef4444",
+        });
+      });
+  };
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Weak Password",
+        html: `
+          Password must meet the following rules:<br/>
+          - Minimum 8 characters<br/>
+          - At least 1 uppercase letter<br/>
+          - At least 1 lowercase letter<br/>
+          - At least 1 number<br/>
+          - At least 1 special character (@$!%*?&)`,
+        confirmButtonColor: "#f59e0b",
+      });
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        setUser(res.user);
+        Swal.fire({
+          icon: "success",
+          title: "Signed In!",
+          text: `Welcome back, ${res.user.email}`,
+          confirmButtonColor: "#6366f1",
+        });
+        form.reset();
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: err.message,
+          confirmButtonColor: "#ef4444",
+        });
+      });
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUser(null);
+        Swal.fire({
+          icon: "success",
+          title: "Logged Out",
+          confirmButtonColor: "#6366f1",
+        });
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message,
+          confirmButtonColor: "#ef4444",
+        });
+      });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-400 flex items-center justify-center px-4">
-      <div className="card w-full max-w-md bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl border border-white/30">
-        <div className="card-body">
-          <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
-            Welcome Back 👋
-          </h1>
-          <p className="text-center text-gray-600 mb-6">
-            Sign in to continue to your account
-          </p>
+    <div
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-          <form>
-            {/* Email Field */}
-            <div className="form-control mb-3">
-              <label className="label">
-                <span className="label-text font-medium text-gray-700">
-                  Email
-                </span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                className="input input-bordered w-full bg-white/70"
-                required
-              />
-            </div>
+      <div className="relative z-10 w-full max-w-md p-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl shadow-2xl">
+        <h1 className="text-4xl font-bold text-center text-white drop-shadow mb-3">
+          {user ? "Welcome 👋" : "Welcome Back 👋"}
+        </h1>
 
-            {/* Password Field */}
-            <div className="form-control mb-4">
-              <label className="label">
-                <span className="label-text font-medium text-gray-700">
-                  Password
-                </span>
-              </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                className="input input-bordered w-full bg-white/70"
-                required
-              />
-              <label className="label">
-                <a
-                  href="#"
-                  className="label-text-alt link link-hover text-indigo-700"
-                >
-                  Forgot password?
-                </a>
-              </label>
-            </div>
+        {user ? (
+          <div className="text-center space-y-4">
+            <p className="text-green-200 font-semibold">
+              You are logged in as {user.email}
+            </p>
+            <img
+              src={user?.photoURL || "https://via.placeholder.com/150"}
+              alt="User Avatar"
+              className="mx-auto mt-3 w-20 h-20 rounded-full"
+            />
+            <h2 className="text-xl font-semibold">{user?.displayName}</h2>
 
-            {/* Submit Button */}
-            <button className="btn bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-700 hover:to-pink-600 w-full mt-2 text-white font-semibold border-none">
-              Sign In
+            <button
+              onClick={handleSignOut}
+              className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-all duration-300"
+            >
+              Logout
             </button>
-          </form>
+          </div>
+        ) : (
+          <>
+            <p className="text-center text-gray-200 mb-6">
+              Sign in to continue to your account
+            </p>
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div>
+                <label className="block text-gray-100 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  className="w-full p-3 rounded-lg bg-white/80 text-gray-900 outline-none focus:ring-2 focus:ring-indigo-400"
+                  required
+                />
+              </div>
 
-          {/* Divider */}
-          <div className="divider text-gray-400">OR</div>
+              <div className="relative">
+                <label className="block text-gray-100 mb-1">Password</label>
+                <input
+                  type={show ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  className="w-full p-3 rounded-lg bg-white/80 text-gray-900 outline-none focus:ring-2 focus:ring-indigo-400 pr-10"
+                  required
+                />
+                <div
+                  className="absolute right-3 top-10 text-gray-600 cursor-pointer"
+                  onClick={() => setShow(!show)}
+                >
+                  {show ? <FaRegEye size={20} /> : <FaRegEyeSlash size={20} />}
+                </div>
 
-          {/* Social Login */}
-          <button className="btn btn-outline w-full mb-2 bg-white/70 hover:bg-white">
-            <img
-              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
-            Continue with Google
-          </button>
-          <button className="btn btn-outline w-full bg-white/70 hover:bg-white">
-            <img
-              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-              alt="Github"
-              className="w-5 h-5 mr-2"
-            />
-            Continue with GitHub
-          </button>
+                <div className="text-right mt-1">
+                  <a
+                    href="#"
+                    className="text-sm font-semibold text-indigo-300 hover:text-indigo-400"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
 
-          {/* Footer */}
-          <p className="text-center text-sm text-gray-600 mt-5">
-            Don’t have an account?{" "}
-            <Link to="/register" className="link link-hover text-indigo-700 font-medium">
-              Register now
-            </Link>
-          </p>
-        </div>
+              <button className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-purple-700 hover:to-pink-600 transition-all duration-300">
+                Sign In
+              </button>
+            </form>
+
+            <div className="flex items-center my-5">
+              <hr className="flex-grow border-gray-400" />
+              <span className="text-gray-200 px-3">OR</span>
+              <hr className="flex-grow border-gray-400" />
+            </div>
+
+            <button
+              onClick={handleGoogleSignIn}
+              className="btn btn-outline w-full mb-2 bg-white/70 hover:bg-white flex justify-center items-center gap-2"
+            >
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                alt="Google"
+                className="w-5 h-5"
+              />
+              Continue with Google
+            </button>
+
+            <button className="btn btn-outline w-full bg-white/70 hover:bg-white flex justify-center items-center gap-2">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                alt="Github"
+                className="w-5 h-5"
+              />
+              Continue with GitHub
+            </button>
+
+            <p className="text-center text-sm text-gray-200 mt-5">
+              Don’t have an account?{" "}
+              <Link
+                to="/register"
+                className="text-yellow-300 link link-hover font-medium"
+              >
+                Register now
+              </Link>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-export default SingIn;
+export default SignIn;
