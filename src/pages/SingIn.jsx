@@ -1,29 +1,27 @@
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  sendPasswordResetEmail,
-} from "firebase/auth";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router";
-import { auth } from "../firebase/FirebaseConfig";
 import Swal from "sweetalert2";
-import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-
-const googleProvider = new GoogleAuthProvider();
-const githubProvider = new GithubAuthProvider();
+import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
+import { AuthenticationContext } from "../Context/AuthenticationContext";
 
 const SignIn = () => {
-  const [user, setUser] = useState(null);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
 
+  const {
+    signOutUserFunc,
+    endPassResetEmailFunc,
+    signInWithEmailAndPasswordFunc,
+    signInWithGithubFunc,
+    signInWithGoogleFunc,
+    user,
+    setUser,
+  } = useContext(AuthenticationContext);
+
   // 🔹 Google Sign In
   const handleGoogleSignIn = () => {
-    signInWithPopup(auth, googleProvider)
+    signInWithGoogleFunc()
       .then((res) => {
         setUser(res.user);
         Swal.fire({
@@ -45,7 +43,7 @@ const SignIn = () => {
 
   // 🔹 Github Sign In
   const handleGithubSignIn = () => {
-    signInWithPopup(auth, githubProvider)
+    signInWithGithubFunc()
       .then((res) => {
         setUser(res.user);
         Swal.fire({
@@ -65,7 +63,7 @@ const SignIn = () => {
       });
   };
 
-  // 🔹 Forgot Password (Reset Email)
+  // 🔹 Forgot Password (FIXED)
   const handleForgetPassword = async () => {
     if (!email) {
       Swal.fire({
@@ -78,7 +76,7 @@ const SignIn = () => {
     }
 
     try {
-      await sendPasswordResetEmail(auth, email);
+      await endPassResetEmailFunc(email); // ✅ email parameter দেওয়া হলো
       Swal.fire({
         icon: "success",
         title: "Password Reset Sent!",
@@ -96,7 +94,7 @@ const SignIn = () => {
   };
 
   // 🔹 Email/Password Sign In
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     const form = e.target;
     const emailValue = form.email.value.trim();
@@ -122,39 +120,40 @@ const SignIn = () => {
       return;
     }
 
-    signInWithEmailAndPassword(auth, emailValue, password)
-      .then((res) => {
-        if (!res.user.emailVerified) {
-          Swal.fire({
-            icon: "warning",
-            title: "Email Not Verified",
-            text: "Please verify your email before signing in.",
-            confirmButtonColor: "#f59e0b",
-          });
-          return;
-        }
-        setUser(res.user);
+    try {
+      const res = await signInWithEmailAndPasswordFunc(emailValue, password);
+
+      if (!res.user.emailVerified) {
         Swal.fire({
-          icon: "success",
-          title: "Signed In!",
-          text: `Welcome back, ${res.user.email}`,
-          confirmButtonColor: "#6366f1",
+          icon: "warning",
+          title: "Email Not Verified",
+          text: "Please verify your email before signing in.",
+          confirmButtonColor: "#f59e0b",
         });
-        form.reset();
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: err.message,
-          confirmButtonColor: "#ef4444",
-        });
+        return;
+      }
+
+      setUser(res.user);
+      Swal.fire({
+        icon: "success",
+        title: "Signed In!",
+        text: `Welcome back, ${res.user.email}`,
+        confirmButtonColor: "#6366f1",
       });
+      form.reset();
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: err.message,
+        confirmButtonColor: "#ef4444",
+      });
+    }
   };
 
   // 🔹 Sign Out
   const handleSignOut = () => {
-    signOut(auth)
+    signOutUserFunc()
       .then(() => {
         setUser(null);
         Swal.fire({

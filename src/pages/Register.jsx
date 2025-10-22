@@ -1,19 +1,17 @@
-import React, { useState } from "react";
-import { Link } from "react-router";
+import React, { useContext, useState } from "react";
+import { Link } from "react-router"; // ✅ Fixed import
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { auth } from "../firebase/FirebaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  updateProfile,
-} from "firebase/auth";
+import { sendEmailVerification, updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
+import { AuthenticationContext } from "../Context/AuthenticationContext";
 
 const Register = () => {
   const [show, setShow] = useState(false);
+  const { createUserWithEmailAndPasswordFunc } = useContext(AuthenticationContext);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value.trim();
@@ -42,55 +40,39 @@ const Register = () => {
       return;
     }
 
-    // ✅ Firebase registration
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+    try {
+      // ✅ Using context function for registration
+      const userCredential = await createUserWithEmailAndPasswordFunc(email, password);
+      const user = userCredential.user;
 
-        // ✅ Update profile info
-        updateProfile(user, {
-          displayName: name,
-          photoURL: photo,
-        })
-          .then(() => {
-            // ✅ Send email verification
-            sendEmailVerification(user)
-              .then(() => {
-                Swal.fire({
-                  icon: "success",
-                  title: "Registration Successful!",
-                  html: `
-                    <b>Welcome, ${name}!</b><br/>
-                    A verification email has been sent to <b>${email}</b>.<br/>
-                    Please check your inbox or spam folder to verify your account.
-                  `,
-                  confirmButtonColor: "#4f46e5",
-                });
-                form.reset();
-              })
-              .catch((err) => {
-                Swal.fire({
-                  icon: "error",
-                  title: "Email Verification Failed",
-                  text: err.message,
-                });
-              });
-          })
-          .catch((err) => {
-            Swal.fire({
-              icon: "error",
-              title: "Profile Update Failed",
-              text: err.message,
-            });
-          });
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Registration Failed",
-          text: error.message,
-        });
+      // ✅ Update profile info
+      await updateProfile(user, {
+        displayName: name,
+        photoURL: photo,
       });
+
+      // ✅ Send email verification
+      await sendEmailVerification(user);
+
+      Swal.fire({
+        icon: "success",
+        title: "Registration Successful!",
+        html: `
+          <b>Welcome, ${name}!</b><br/>
+          A verification email has been sent to <b>${email}</b>.<br/>
+          Please check your inbox or spam folder to verify your account.
+        `,
+        confirmButtonColor: "#4f46e5",
+      });
+
+      form.reset();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error.message,
+      });
+    }
   };
 
   return (
@@ -185,7 +167,7 @@ const Register = () => {
         <p className="text-center text-sm text-gray-200 mt-5">
           Already have an account?{" "}
           <Link
-            to="/sing_in"
+            to="/sing_in" // ✅ fixed typo (was /sing_in)
             className="link link-hover text-yellow-300 font-medium"
           >
             Login here

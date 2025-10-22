@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {  signOut } from "firebase/auth";
 import { auth } from "../firebase/FirebaseConfig";
 import Swal from "sweetalert2";
 import { FaUserCircle } from "react-icons/fa"; // 👤 Profile icon
 import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
+import { AuthenticationContext } from "../Context/AuthenticationContext";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
-
-  // ✅ Firebase auth state listener
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+  // ✅ Use context correctly
+  const { user } = useContext(AuthenticationContext);
 
   // ✅ Logout function
   const handleLogout = async () => {
@@ -130,7 +124,7 @@ const Navbar = () => {
           {user ? (
             <>
               {/* 👤 Profile icon next to Logout */}
-              <NavLink to="/profile" className="text-4xl text-gray-700  hover:text-blue-600">
+              <NavLink to="/profile" className="text-4xl text-gray-700 hover:text-blue-600">
                 <FaUserCircle />
               </NavLink>
               <button
@@ -144,7 +138,7 @@ const Navbar = () => {
             </>
           ) : (
             <NavLink
-              to="/sing_in"
+              to="/sign_in"
               className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
                          hover:from-indigo-600 hover:to-blue-500 transition-all duration-300
                          px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
