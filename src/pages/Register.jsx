@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router"; // ✅ Fixed import
+import { Link, useNavigate } from "react-router"; // ✅ useNavigate যোগ করো
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { auth } from "../firebase/FirebaseConfig";
 import { sendEmailVerification, updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
 import { AuthenticationContext } from "../Context/AuthenticationContext";
@@ -10,6 +9,7 @@ import { AuthenticationContext } from "../Context/AuthenticationContext";
 const Register = () => {
   const [show, setShow] = useState(false);
   const { createUserWithEmailAndPasswordFunc } = useContext(AuthenticationContext);
+  const navigate = useNavigate(); // ✅ navigation setup
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -19,7 +19,7 @@ const Register = () => {
     const email = form.email.value.trim();
     const password = form.password.value;
 
-    //  Password validation
+    // Password validation
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
@@ -41,17 +41,17 @@ const Register = () => {
     }
 
     try {
-      //  Using context function for registration
+      // Create user
       const userCredential = await createUserWithEmailAndPasswordFunc(email, password);
       const user = userCredential.user;
 
-      //  Update profile info
+      // Update profile
       await updateProfile(user, {
         displayName: name,
         photoURL: photo,
       });
 
-      //  Send email verification
+      // Send verification email
       await sendEmailVerification(user);
 
       Swal.fire({
@@ -63,6 +63,9 @@ const Register = () => {
           Please check your inbox or spam folder to verify your account.
         `,
         confirmButtonColor: "#4f46e5",
+      }).then(() => {
+        // ✅ Redirect to Sign In page after success
+        navigate("/Sing_in");
       });
 
       form.reset();
@@ -158,7 +161,7 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button className="btn bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-700 hover:to-pink-600 w-full mt-2 text-white font-semibold border-none">
             Register
           </button>
@@ -167,7 +170,7 @@ const Register = () => {
         <p className="text-center text-sm text-gray-200 mt-5">
           Already have an account?{" "}
           <Link
-            to="/Sing_in" //  fixed typo (was /sing_in)
+            to="/Sing_in"
             className="link link-hover text-yellow-300 font-medium"
           >
             Login here

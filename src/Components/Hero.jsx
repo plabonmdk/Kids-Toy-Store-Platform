@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import heroBg from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-import img1 from "../assets/images (1).jpeg";
-import img2 from "../assets/images (2).jpeg";
-import img3 from "../assets/images (3).jpeg";
-import img4 from "../assets/images (4).jpeg";
-import img5 from "../assets/images (5).jpeg";
-import img6 from "../assets/images.jpeg";
-
-const images = [img1, img2, img3, img4, img5, img6];
+import heroImg1 from "../assets/Untitled design (1).png";
+import heroImg2 from "../assets/Untitled design (2).png";
+import heroImg3 from "../assets/Untitled design (3).png";
+import heroImg4 from "../assets/Untitled design (4).png";
+import heroImg5 from "../assets/Untitled design (5).png";
+import heroImg6 from "../assets/Untitled design.png";
+import { Link } from "react-router";
 
 const Hero = () => {
-  const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
+  const images = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6];
+  const [current, setCurrent] = useState(0);
 
+  // Auto change background every 5 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDirection(1);
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  const prevSlide = () => {
+    setCurrent((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const nextSlide = () => {
+    setCurrent((prev) => (prev + 1) % images.length);
+  };
 
   const variants = {
     enter: (direction) => ({
@@ -44,93 +50,60 @@ const Hero = () => {
   };
 
   return (
-    <section
-      className="relative overflow-hidden text-white px-4 sm:px-6 md:px-10 lg:px-16 py-10 sm:py-16 md:py-20 lg:py-24 bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `url(${heroBg})`,
-        backgroundBlendMode: "overlay",
-        backgroundColor: "#7E57C2cc",
-      }}
-    >
-      <div className="max-w-[1400px] mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-10 lg:gap-16">
-        {/* LEFT TEXT CONTENT */}
-        <motion.div
-          className="flex-1 w-full text-center lg:text-left space-y-6"
-          initial={{ opacity: 0, x: -80 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-        >
-          <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-snug"
-            initial={{ y: -30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            Eco-Friendly Toys <br className="hidden sm:block" /> That Foster
-            Creativity
-          </motion.h1>
+    <section className="relative w-full h-[60vh] md:h-[80vh] lg:h-[90vh] overflow-hidden">
+      {/* Background image */}
+      {images.map((img, index) => (
+        <img
+          key={index}
+          src={img}
+          alt={`Slide ${index + 1}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+            index === current ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
 
-          <motion.p
-            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-100 max-w-md mx-auto lg:mx-0 leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-          >
-            Fun, planet-safe toys that inspire imagination. Perfect for endless
-            open-ended play and exploration.
-          </motion.p>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
 
-          <motion.button
-            className="bg-white text-[#7E57C2] font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition duration-300"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            Explore Now
-          </motion.button>
-        </motion.div>
+      {/* Content */}
+      <div className="relative z-10 max-w-6xl mx-auto h-full flex items-center px-6 md:px-12">
+        <div className="text-center md:text-left w-full md:w-2/3 lg:w-1/2">
+          <h1 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight">
+            WHERE DREAMS
+            <span className="block">COME TRUE</span>
+          </h1>
 
-        {/* RIGHT SLIDESHOW IMAGE */}
-        <motion.div
-          className="flex-1 flex justify-center lg:justify-end relative w-full"
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
-        >
-          <div className="bg-white rounded-[30px] p-2 sm:p-3 w-full max-w-[500px] overflow-hidden relative h-[220px] sm:h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center shadow-lg">
-            <AnimatePresence custom={direction} mode="wait">
-              <motion.img
-                key={images[index]}
-                src={images[index]}
-                alt="Toy"
-                className="rounded-[25px] object-cover absolute w-full h-full"
-                variants={variants}
-                custom={direction}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 100, damping: 20 },
-                  opacity: { duration: 0.4 },
-                }}
-              />
-            </AnimatePresence>
+          <p className="mt-4 text-white/85 text-sm sm:text-base md:text-lg">
+            Playful exploration and delightful moments — perfect for little
+            learners and big imaginations.
+          </p>
+
+          <div className="mt-6 flex justify-center md:justify-start gap-3">
+            <Link to="/" className="px-5 py-2 bg-white text-black rounded-md shadow-sm font-medium">
+              Browse Collection
+            </Link>
+            
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Floating Decorations */}
-      <motion.div
-        className="absolute top-8 left-6 w-10 h-10 bg-pink-300 rounded-full opacity-70 blur-md hidden sm:block"
-        animate={{ y: [0, -10, 0], x: [0, 5, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      ></motion.div>
+      {/* Navigation */}
+      <button
+        onClick={prevSlide}
+        aria-label="Previous"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur flex items-center justify-center hover:bg-white/50 transition"
+      >
+        <FaChevronLeft className="text-white" />
+      </button>
 
-      <motion.div
-        className="absolute bottom-10 right-10 w-14 h-14 bg-green-300 rounded-full opacity-60 blur-md hidden sm:block"
-        animate={{ y: [0, 15, 0], x: [0, -5, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      ></motion.div>
+      <button
+        onClick={nextSlide}
+        aria-label="Next"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur flex items-center justify-center hover:bg-white/50 transition"
+      >
+        <FaChevronRight className="text-white" />
+      </button>
     </section>
   );
 };

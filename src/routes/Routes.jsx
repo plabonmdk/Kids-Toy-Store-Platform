@@ -8,6 +8,7 @@ import Register from "../pages/Register";
 import SingIn from "../pages/SingIn";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
 import ForgotPassword from "../pages/ForgotPassword";
+import Details from "../pages/Details";
 
 
 
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
         {
             index: true,
             element: <HomePages></HomePages>,
+            
         },
         {
            path:"/about",
@@ -43,7 +45,11 @@ export const router = createBrowserRouter([
         {
             path: "/forgat",
             element: <ForgotPassword></ForgotPassword>
-        }
+        },
+        {
+            path: "/details/:id",
+            element: <Details></Details>
+        },
     ]
   },
 ]);

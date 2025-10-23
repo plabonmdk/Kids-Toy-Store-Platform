@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
+import { Link } from 'react-router';
 
 const AboutPages = () => {
   const [toys, setToys] = useState([]);
-  const [expandedToys, setExpandedToys] = useState({}); // Track which toy descriptions are expanded
+  const [expandedToys, setExpandedToys] = useState({}); 
 
   useEffect(() => {
     fetch("/toyCollection.json")
       .then((res) => res.json())
-      .then((data) => {
-        setToys(data);
-      })
+      .then((data) => setToys(data))
       .catch((error) => console.error("Error loading toys:", error));
   }, []);
 
@@ -26,13 +25,9 @@ const AboutPages = () => {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push(<FaStar key={i} className="text-yellow-400" />);
-      } else if (rating >= i - 0.5) {
-        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
-      } else {
-        stars.push(<FaRegStar key={i} className="text-yellow-400" />);
-      }
+      if (rating >= i) stars.push(<FaStar key={i} className="text-yellow-400" />);
+      else if (rating >= i - 0.5) stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+      else stars.push(<FaRegStar key={i} className="text-yellow-400" />);
     }
     return stars;
   };
@@ -75,8 +70,6 @@ const AboutPages = () => {
                     {toy.toyName}
                   </h2>
 
-                 
-
                   <p className="text-gray-600 text-sm mb-4">
                     {isExpanded ? toy.description : truncatedDescription}
                     {toy.description.length > 100 && (
@@ -84,12 +77,13 @@ const AboutPages = () => {
                         onClick={() => toggleDescription(toy.toyId)}
                         className="text-purple-600 font-semibold ml-1"
                       >
-                       
+                        {isExpanded ? "Show less" : "Read more"}
                       </button>
                     )}
                   </p>
-                   <div className="flex items-center justify-between">
-                    <p className="text-gray-600 text-sm mb-4">
+
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-gray-600 text-sm">
                       Available Quantity: <span className="font-medium">{toy.availableQuantity}</span>
                     </p>
                     <p className="ml-2 flex text-gray-600 items-center text-sm">
@@ -98,9 +92,12 @@ const AboutPages = () => {
                     </p>
                   </div>
 
-                  <button className="mt-auto w-full bg-[#7E57C2] hover:bg-[#6A42B8] text-white font-semibold py-3 rounded-2xl transition duration-300">
+                  <Link
+                    to={`/details/${toy.toyId}`}
+                    className="mt-auto w-full bg-[#7E57C2] hover:bg-[#6A42B8] text-white font-semibold py-3 rounded-2xl transition duration-300 text-center"
+                  >
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             );
