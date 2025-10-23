@@ -19,7 +19,7 @@ const Register = () => {
     const email = form.email.value.trim();
     const password = form.password.value;
 
-    // ✅ Password validation
+    //  Password validation
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
@@ -41,17 +41,17 @@ const Register = () => {
     }
 
     try {
-      // ✅ Using context function for registration
+      //  Using context function for registration
       const userCredential = await createUserWithEmailAndPasswordFunc(email, password);
       const user = userCredential.user;
 
-      // ✅ Update profile info
+      //  Update profile info
       await updateProfile(user, {
         displayName: name,
         photoURL: photo,
       });
 
-      // ✅ Send email verification
+      //  Send email verification
       await sendEmailVerification(user);
 
       Swal.fire({
@@ -167,7 +167,7 @@ const Register = () => {
         <p className="text-center text-sm text-gray-200 mt-5">
           Already have an account?{" "}
           <Link
-            to="/sing_in" // ✅ fixed typo (was /sing_in)
+            to="/Sing_in" //  fixed typo (was /sing_in)
             className="link link-hover text-yellow-300 font-medium"
           >
             Login here

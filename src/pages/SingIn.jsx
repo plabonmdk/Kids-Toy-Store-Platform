@@ -23,7 +23,7 @@ const SignIn = () => {
     setUser,
   } = useContext(AuthenticationContext);
 
-  // 🔹 Google Sign In
+  //  Google Sign In
   const handleGoogleSignIn = async () => {
     try {
       const res = await signInWithGoogleFunc();
@@ -45,7 +45,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 Github Sign In
+  //  Github Sign In
   const handleGithubSignIn = async () => {
     try {
       const res = await signInWithGithubFunc();
@@ -67,7 +67,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 Forgot Password
+  //  Forgot Password
   const handleForgetPassword = async () => {
     if (!email) {
       Swal.fire({
@@ -97,7 +97,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 Email/Password Sign In
+  //  Email/Password Sign In
   const handleSignIn = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -153,7 +153,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 Sign Out
+  //  Sign Out
   const handleSignOut = async () => {
     try {
       await signOutUserFunc();
@@ -173,7 +173,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 UI
+  // UI
   return (
     <div
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -187,7 +187,7 @@ const SignIn = () => {
 
       <div className="relative z-10 w-full max-w-md p-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl shadow-2xl">
         <h1 className="text-4xl font-bold text-center text-white drop-shadow mb-3">
-          {user ? "Welcome 👋" : "Welcome Back 👋"}
+          {user ? "Welcome " : "Welcome Back "}
         </h1>
 
         {user ? (
@@ -247,7 +247,7 @@ const SignIn = () => {
                 </div>
 
                 <div className="text-right mt-1">
-                  <button
+                  <button to="/forgat"
                     type="button"
                     onClick={handleForgetPassword}
                     className="text-sm font-semibold text-indigo-300 hover:text-indigo-400"

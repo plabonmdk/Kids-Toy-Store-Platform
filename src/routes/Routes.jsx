@@ -7,6 +7,7 @@ import ProfilePages from "../pages/ProfilePages";
 import Register from "../pages/Register";
 import SingIn from "../pages/SingIn";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
+import ForgotPassword from "../pages/ForgotPassword";
 
 
 
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
             path:"/sing_in",
             element: <SingIn></SingIn>,
         },
+        {
+            path: "/forgat",
+            element: <ForgotPassword></ForgotPassword>
+        }
     ]
   },
 ]);
