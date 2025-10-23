@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink } from "react-router";
-import {  signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "../firebase/FirebaseConfig";
 import Swal from "sweetalert2";
-import { FaUserCircle } from "react-icons/fa"; // 👤 Profile icon
-import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
 import { AuthenticationContext } from "../Context/AuthenticationContext";
+import { FaUserCircle } from "react-icons/fa";
+import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
 
 const Navbar = () => {
-  // ✅ Use context correctly
   const { user } = useContext(AuthenticationContext);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // ✅ Logout function
   const handleLogout = async () => {
@@ -30,7 +30,7 @@ const Navbar = () => {
     }
   };
 
-  // ✅ Active link style
+  // ✅ NavLink active style
   const navLinkStyle = ({ isActive }) =>
     isActive
       ? "text-blue-600 font-semibold border-b-2 border-blue-600"
@@ -58,8 +58,6 @@ const Navbar = () => {
                 />
               </svg>
             </label>
-
-            {/* Dropdown Menu (Mobile) */}
             <ul
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow"
@@ -74,7 +72,6 @@ const Navbar = () => {
                   About
                 </NavLink>
               </li>
-              {/* ✅ Profile only when logged in */}
               {user && (
                 <li>
                   <NavLink to="/profile" className={navLinkStyle}>
@@ -108,7 +105,6 @@ const Navbar = () => {
                 About
               </NavLink>
             </li>
-            {/* ✅ Show profile only when user logged in */}
             {user && (
               <li>
                 <NavLink to="/profile" className={navLinkStyle}>
@@ -120,13 +116,51 @@ const Navbar = () => {
         </div>
 
         {/* Navbar End */}
-        <div className="navbar-end flex items-center gap-3">
+        <div className="navbar-end flex items-center gap-3 relative">
           {user ? (
             <>
-              {/* 👤 Profile icon next to Logout */}
-              <NavLink to="/profile" className="text-4xl text-gray-700 hover:text-blue-600">
-                <FaUserCircle />
-              </NavLink>
+              {/* Profile Picture + Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => setShowDropdown(true)}
+                onMouseLeave={() => setShowDropdown(false)}
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer hover:scale-105 transition-transform"
+                  />
+                ) : (
+                  <FaUserCircle className="text-4xl text-gray-700 hover:text-blue-600 cursor-pointer" />
+                )}
+
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white border rounded-lg shadow-lg p-4 z-50">
+                    <p className="font-semibold text-gray-800">
+                      {user.displayName || "No Name"}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {user.email || "No Email"}
+                    </p>
+                    <hr className="my-2" />
+                    <NavLink
+                      to="/profile"
+                      className="block text-blue-600 hover:underline mb-2"
+                    >
+                      View Profile
+                    </NavLink>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left text-red-500 hover:text-red-700"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ✅ Logout Button Beside Profile */}
               <button
                 onClick={handleLogout}
                 className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 
@@ -137,14 +171,24 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <NavLink
-              to="/sign_in"
-              className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
+            <>
+              <NavLink
+                to="/sing_in"
+                className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
                          hover:from-indigo-600 hover:to-blue-500 transition-all duration-300
                          px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
-            >
-              Sign In
-            </NavLink>
+              >
+                Sign In
+              </NavLink>
+              <NavLink
+                to="/register"
+                className="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-none 
+                         hover:from-indigo-600 hover:to-blue-500 transition-all duration-300
+                         px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
+              >
+                Register
+              </NavLink>
+            </>
           )}
         </div>
       </div>
