@@ -8,7 +8,7 @@ import { FaUserCircle } from "react-icons/fa";
 import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favpng-FGqTHPsrqFtCLBdL6N16YdGEj.jpg";
 
 const Navbar = () => {
-  const { user } = useContext(AuthenticationContext);
+  const { user, loading } = useContext(AuthenticationContext); // ✅ include loading from context
   const [showDropdown, setShowDropdown] = useState(false);
 
   // ✅ Logout function
@@ -117,7 +117,12 @@ const Navbar = () => {
 
         {/* Navbar End */}
         <div className="navbar-end flex items-center gap-3 relative">
-          {user ? (
+          {/* ✅ Show loading spinner while checking auth */}
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <span className="loading loading-spinner loading-md text-blue-600"></span>
+            </div>
+          ) : user ? (
             <>
               {/* Profile Picture + Dropdown */}
               <div
@@ -160,7 +165,7 @@ const Navbar = () => {
                 )}
               </div>
 
-              {/* ✅ Logout Button Beside Profile */}
+              {/* ✅ Logout Button */}
               <button
                 onClick={handleLogout}
                 className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 

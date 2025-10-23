@@ -6,6 +6,7 @@ import AboutPages from "../pages/AboutPages";
 import ProfilePages from "../pages/ProfilePages";
 import Register from "../pages/Register";
 import SingIn from "../pages/SingIn";
+import PrivateRoute from "../PrivateRoute/PrivateRoute";
 
 
 
@@ -26,7 +27,9 @@ export const router = createBrowserRouter([
         },
         {
             path:"/profile",
-            element: <ProfilePages></ProfilePages>,
+            element: <PrivateRoute>
+                <ProfilePages></ProfilePages>
+            </PrivateRoute>,
         },
         {
             path:"/register",

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
@@ -8,6 +8,10 @@ import { AuthenticationContext } from "../Context/AuthenticationContext";
 const SignIn = () => {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/profile";
+  
 
   const {
     signOutUserFunc,
@@ -20,50 +24,50 @@ const SignIn = () => {
   } = useContext(AuthenticationContext);
 
   // 🔹 Google Sign In
-  const handleGoogleSignIn = () => {
-    signInWithGoogleFunc()
-      .then((res) => {
-        setUser(res.user);
-        Swal.fire({
-          icon: "success",
-          title: "Signed In with Google!",
-          text: `Welcome, ${res.user.displayName}`,
-          confirmButtonColor: "#6366f1",
-        });
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: err.message,
-          confirmButtonColor: "#ef4444",
-        });
+  const handleGoogleSignIn = async () => {
+    try {
+      const res = await signInWithGoogleFunc();
+      setUser(res.user);
+      Swal.fire({
+        icon: "success",
+        title: "Signed In with Google!",
+        text: `Welcome, ${res.user.displayName}`,
+        confirmButtonColor: "#6366f1",
       });
+      navigate(from, { replace: true });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: err.message,
+        confirmButtonColor: "#ef4444",
+      });
+    }
   };
 
   // 🔹 Github Sign In
-  const handleGithubSignIn = () => {
-    signInWithGithubFunc()
-      .then((res) => {
-        setUser(res.user);
-        Swal.fire({
-          icon: "success",
-          title: "Signed In with GitHub!",
-          text: `Welcome, ${res.user.displayName || "User"}`,
-          confirmButtonColor: "#6366f1",
-        });
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: err.message,
-          confirmButtonColor: "#ef4444",
-        });
+  const handleGithubSignIn = async () => {
+    try {
+      const res = await signInWithGithubFunc();
+      setUser(res.user);
+      Swal.fire({
+        icon: "success",
+        title: "Signed In with GitHub!",
+        text: `Welcome, ${res.user.displayName || "User"}`,
+        confirmButtonColor: "#6366f1",
       });
+      navigate(from, { replace: true });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: err.message,
+        confirmButtonColor: "#ef4444",
+      });
+    }
   };
 
-  // 🔹 Forgot Password (FIXED)
+  // 🔹 Forgot Password
   const handleForgetPassword = async () => {
     if (!email) {
       Swal.fire({
@@ -76,10 +80,10 @@ const SignIn = () => {
     }
 
     try {
-      await endPassResetEmailFunc(email); // ✅ email parameter দেওয়া হলো
+      await endPassResetEmailFunc(email);
       Swal.fire({
         icon: "success",
-        title: "Password Reset Sent!",
+        title: "Password Reset Email Sent!",
         text: "Check your inbox for reset instructions.",
         confirmButtonColor: "#6366f1",
       });
@@ -108,12 +112,10 @@ const SignIn = () => {
         icon: "warning",
         title: "Weak Password",
         html: `
-          Password must meet the following rules:<br/>
-          - Minimum 8 characters<br/>
-          - At least 1 uppercase letter<br/>
-          - At least 1 lowercase letter<br/>
-          - At least 1 number<br/>
-          - At least 1 special character (@$!%*?&)
+          Password must have:<br/>
+          • Minimum 8 characters<br/>
+          • 1 uppercase, 1 lowercase<br/>
+          • 1 number, 1 special character
         `,
         confirmButtonColor: "#f59e0b",
       });
@@ -122,7 +124,6 @@ const SignIn = () => {
 
     try {
       const res = await signInWithEmailAndPasswordFunc(emailValue, password);
-
       if (!res.user.emailVerified) {
         Swal.fire({
           icon: "warning",
@@ -141,10 +142,11 @@ const SignIn = () => {
         confirmButtonColor: "#6366f1",
       });
       form.reset();
+      navigate(from, { replace: true });
     } catch (err) {
       Swal.fire({
         icon: "error",
-        title: "Oops!",
+        title: "Login Failed",
         text: err.message,
         confirmButtonColor: "#ef4444",
       });
@@ -152,24 +154,23 @@ const SignIn = () => {
   };
 
   // 🔹 Sign Out
-  const handleSignOut = () => {
-    signOutUserFunc()
-      .then(() => {
-        setUser(null);
-        Swal.fire({
-          icon: "success",
-          title: "Logged Out",
-          confirmButtonColor: "#6366f1",
-        });
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: err.message,
-          confirmButtonColor: "#ef4444",
-        });
+  const handleSignOut = async () => {
+    try {
+      await signOutUserFunc();
+      setUser(null);
+      Swal.fire({
+        icon: "success",
+        title: "Logged Out",
+        confirmButtonColor: "#6366f1",
       });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message,
+        confirmButtonColor: "#ef4444",
+      });
+    }
   };
 
   // 🔹 UI
@@ -192,7 +193,7 @@ const SignIn = () => {
         {user ? (
           <div className="text-center space-y-4">
             <p className="text-green-200 font-semibold">
-              You are logged in as {user.email}
+              Logged in as {user.email}
             </p>
             <img
               src={user?.photoURL || "https://via.placeholder.com/150"}
