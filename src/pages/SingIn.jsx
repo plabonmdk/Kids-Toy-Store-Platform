@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
@@ -11,11 +11,9 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/profile";
-  
 
   const {
     signOutUserFunc,
-    endPassResetEmailFunc,
     signInWithEmailAndPasswordFunc,
     signInWithGithubFunc,
     signInWithGoogleFunc,
@@ -23,7 +21,7 @@ const SignIn = () => {
     setUser,
   } = useContext(AuthenticationContext);
 
-  //  Google Sign In
+  // 🔹 Google Sign In
   const handleGoogleSignIn = async () => {
     try {
       const res = await signInWithGoogleFunc();
@@ -67,37 +65,7 @@ const SignIn = () => {
     }
   };
 
-  //  Forgot Password
-  const handleForgetPassword = async () => {
-    if (!email) {
-      Swal.fire({
-        icon: "warning",
-        title: "Email Required",
-        text: "Please enter your email address first!",
-        confirmButtonColor: "#f59e0b",
-      });
-      return;
-    }
-
-    try {
-      await endPassResetEmailFunc(email);
-      Swal.fire({
-        icon: "success",
-        title: "Password Reset Email Sent!",
-        text: "Check your inbox for reset instructions.",
-        confirmButtonColor: "#6366f1",
-      });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.message,
-        confirmButtonColor: "#ef4444",
-      });
-    }
-  };
-
-  //  Email/Password Sign In
+  //  Email/Password Sign In (without verification)
   const handleSignIn = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -124,16 +92,6 @@ const SignIn = () => {
 
     try {
       const res = await signInWithEmailAndPasswordFunc(emailValue, password);
-      if (!res.user.emailVerified) {
-        Swal.fire({
-          icon: "warning",
-          title: "Email Not Verified",
-          text: "Please verify your email before signing in.",
-          confirmButtonColor: "#f59e0b",
-        });
-        return;
-      }
-
       setUser(res.user);
       Swal.fire({
         icon: "success",
@@ -153,7 +111,7 @@ const SignIn = () => {
     }
   };
 
-  //  Sign Out
+  // 🔹 Sign Out
   const handleSignOut = async () => {
     try {
       await signOutUserFunc();
@@ -173,7 +131,6 @@ const SignIn = () => {
     }
   };
 
-  // UI
   return (
     <div
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -195,11 +152,18 @@ const SignIn = () => {
             <p className="text-green-200 font-semibold">
               Logged in as {user.email}
             </p>
+
+            {/*  Profile Image with fallback */}
             <img
-              src={user?.photoURL || "https://via.placeholder.com/150"}
+              src={
+                user?.photoURL && user.photoURL !== ""
+                  ? user.photoURL
+                  : "https://i.ibb.co/4pDNDk1/avatar.png"
+              }
               alt="User Avatar"
-              className="mx-auto mt-3 w-20 h-20 rounded-full"
+              className="mx-auto mt-3 w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
             />
+
             <h2 className="text-xl font-semibold text-white">
               {user?.displayName || "Anonymous User"}
             </h2>
@@ -247,13 +211,12 @@ const SignIn = () => {
                 </div>
 
                 <div className="text-right mt-1">
-                  <button to="/forgat"
-                    type="button"
-                    onClick={handleForgetPassword}
+                  <Link
+                    to="/forgot"
                     className="text-sm font-semibold text-indigo-300 hover:text-indigo-400"
                   >
                     Forgot password?
-                  </button>
+                  </Link>
                 </div>
               </div>
 

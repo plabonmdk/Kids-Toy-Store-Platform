@@ -50,7 +50,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative w-full h-[60vh] md:h-[80vh] lg:h-[90vh] overflow-hidden">
+    <section className="relative w-full mt-16 h-[60vh] md:h-[80vh] lg:h-[90vh] overflow-hidden">
       {/* Background image */}
       {images.map((img, index) => (
         <img

@@ -1,15 +1,15 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router"; // ✅ useNavigate যোগ করো
+import { Link, useNavigate } from "react-router";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { sendEmailVerification, updateProfile } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
 import { AuthenticationContext } from "../Context/AuthenticationContext";
 
 const Register = () => {
   const [show, setShow] = useState(false);
   const { createUserWithEmailAndPasswordFunc } = useContext(AuthenticationContext);
-  const navigate = useNavigate(); // ✅ navigation setup
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -51,21 +51,14 @@ const Register = () => {
         photoURL: photo,
       });
 
-      // Send verification email
-      await sendEmailVerification(user);
-
+      // ✅ Skip email verification
       Swal.fire({
         icon: "success",
         title: "Registration Successful!",
-        html: `
-          <b>Welcome, ${name}!</b><br/>
-          A verification email has been sent to <b>${email}</b>.<br/>
-          Please check your inbox or spam folder to verify your account.
-        `,
+        html: `<b>Welcome, ${name}!</b>`,
         confirmButtonColor: "#4f46e5",
       }).then(() => {
-        // ✅ Redirect to Sign In page after success
-        navigate("/Sing_in");
+        navigate("/Sing_in"); // redirect to login page
       });
 
       form.reset();
@@ -94,12 +87,9 @@ const Register = () => {
         </p>
 
         <form onSubmit={handleRegister}>
-          {/* Name */}
           <div className="form-control mb-3">
             <label className="label">
-              <span className="label-text text-white font-medium">
-                Full Name
-              </span>
+              <span className="label-text text-white font-medium">Full Name</span>
             </label>
             <input
               type="text"
@@ -110,12 +100,9 @@ const Register = () => {
             />
           </div>
 
-          {/* Photo URL */}
           <div className="form-control mb-3">
             <label className="label">
-              <span className="label-text text-white font-medium">
-                Photo URL
-              </span>
+              <span className="label-text text-white font-medium">Photo URL</span>
             </label>
             <input
               type="text"
@@ -125,7 +112,6 @@ const Register = () => {
             />
           </div>
 
-          {/* Email */}
           <div className="form-control mb-3">
             <label className="label">
               <span className="label-text text-white font-medium">Email</span>
@@ -139,12 +125,9 @@ const Register = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="form-control mb-4 relative">
             <label className="label">
-              <span className="label-text text-white font-medium">
-                Password
-              </span>
+              <span className="label-text text-white font-medium">Password</span>
             </label>
             <input
               type={show ? "text" : "password"}
@@ -161,7 +144,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Submit */}
           <button className="btn bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-purple-700 hover:to-pink-600 w-full mt-2 text-white font-semibold border-none">
             Register
           </button>

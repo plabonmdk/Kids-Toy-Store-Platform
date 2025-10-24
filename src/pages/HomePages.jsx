@@ -2,25 +2,35 @@ import React, { useEffect, useState } from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { Link } from "react-router";
 import Hero from "../Components/Hero";
+import { motion } from "framer-motion"; //  Import Framer Motion
+import Loading from "../Components/Loading/Loading";
 
 const HomePages = () => {
   const [toys, setToys] = useState([]);
-  const [expandedToys, setExpandedToys] = useState({}); 
+  const [expandedToys, setExpandedToys] = useState({});
+  const [loading, setLoading] = useState(true); // ✅ Loading state
 
   useEffect(() => {
     fetch("/toyCollection.json")
       .then((res) => res.json())
       .then((data) => {
-        setToys(data);
+        setTimeout(() => {
+          setToys(data);
+          setLoading(false);
+        }, 1500);
       })
-      .catch((error) => console.error("Error loading toys:", error));
+      .catch((error) => {
+        console.error("Error loading toys:", error);
+        setLoading(false);
+      });
   }, []);
 
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (rating >= i) stars.push(<FaStar key={i} className="text-yellow-400" />);
-      else if (rating >= i - 0.5) stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+      else if (rating >= i - 0.5)
+        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
       else stars.push(<FaRegStar key={i} className="text-yellow-400" />);
     }
     return stars;
@@ -33,6 +43,12 @@ const HomePages = () => {
     }));
   };
 
+  //  Animation Variants for Cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
     <>
       <Hero />
@@ -42,32 +58,49 @@ const HomePages = () => {
           Popular Toy Collection
         </h1>
 
-        {toys.length === 0 ? (
-          <p className="text-center text-gray-500">Loading toys...</p>
+        {loading ? (
+          <p className="flex items-center justify-center h-screen text-gray-500 text-lg">
+            <Loading></Loading>
+          </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {toys.slice(0, 6).map((toy) => {
+          <motion.div
+            className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ staggerChildren: 0.15 }}
+          >
+            {toys.slice(0, 6).map((toy, index) => {
               const isExpanded = expandedToys[toy.toyId];
-              const truncatedDescription = toy.description.length > 100
-                ? toy.description.slice(0, 100) + "..."
-                : toy.description;
+              const truncatedDescription =
+                toy.description.length > 100
+                  ? toy.description.slice(0, 100) + "..."
+                  : toy.description;
 
               return (
-                <div
+                <motion.div
                   key={toy.toyId}
-                  className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col"
+                  variants={cardVariants}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                  }}
+                  className="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden flex flex-col transition-all duration-300 cursor-pointer"
                 >
-                  <div className="relative">
+                  {/* Image Section */}
+                  <div className="relative overflow-hidden">
                     <img
-                      src={toy.image}
+                      src={toy.pictureURL}
                       alt={toy.toyName}
-                      className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-85 object-cover transition-transform duration-500 hover:scale-110"
                     />
                     <span className="absolute top-3 right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
                       ${toy.price}
                     </span>
                   </div>
 
+                  {/* Text Section */}
                   <div className="p-6 flex flex-col flex-1">
                     <h2 className="text-xl font-semibold text-gray-800 mb-1">
                       {toy.toyName}
@@ -75,7 +108,10 @@ const HomePages = () => {
 
                     <div className="flex items-center justify-between mb-4">
                       <p className="text-gray-600 text-sm">
-                        Available: <span className="font-medium">{toy.availableQuantity} pcs</span>
+                        Available:{" "}
+                        <span className="font-medium">
+                          {toy.availableQuantity} pcs
+                        </span>
                       </p>
                       <p className="ml-2 flex text-gray-600 items-center text-sm">
                         {renderStars(toy.rating)}
@@ -88,7 +124,7 @@ const HomePages = () => {
                       {toy.description.length > 100 && (
                         <button
                           onClick={() => toggleDescription(toy.toyId)}
-                          className="text-purple-600 font-semibold ml-1"
+                          className="text-purple-600 font-semibold ml-1 hover:underline"
                         >
                           {isExpanded ? "Read less" : "Read more"}
                         </button>
@@ -102,10 +138,10 @@ const HomePages = () => {
                       View Details
                     </Link>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
     </>

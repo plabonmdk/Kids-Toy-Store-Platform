@@ -10,11 +10,13 @@ import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favp
 
 const Navbar = () => {
   const { user, loading } = useContext(AuthenticationContext);
+  console.log(user)
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      setShowDropdown(false); // close dropdown immediately
       Swal.fire({
         icon: "success",
         title: "Logged out successfully!",
@@ -35,7 +37,6 @@ const Navbar = () => {
       ? "text-blue-600 font-semibold border-b-2 border-blue-600"
       : "hover:text-blue-500 transition-colors duration-300";
 
-  // ✅ Animation Variants
   const navVariants = {
     hidden: { y: -80, opacity: 0 },
     visible: {
@@ -47,12 +48,7 @@ const Navbar = () => {
 
   const dropdownVariants = {
     hidden: { opacity: 0, y: -10, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.25 },
-    },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.25 } },
     exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2 } },
   };
 
@@ -173,7 +169,7 @@ const Navbar = () => {
                 {user.photoURL ? (
                   <motion.img
                     whileHover={{ scale: 1.1 }}
-                    src={user.photoURL}
+                    src={user.photoURL || user.reloadUserInfo.photoURL}
                     alt="Profile"
                     className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer"
                   />
@@ -216,18 +212,6 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Logout Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleLogout}
-                className="btn bg-gradient-to-r from-red-500 to-pink-500 text-white border-none 
-                           hover:from-pink-600 hover:to-red-500 transition-all duration-300
-                           px-4 sm:px-5 md:px-6 rounded-full text-sm md:text-base"
-              >
-                Logout
-              </motion.button>
             </>
           ) : (
             <>
