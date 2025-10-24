@@ -9,6 +9,7 @@ import SingIn from "../pages/SingIn";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
 import ForgotPassword from "../pages/ForgotPassword";
 import Details from "../pages/Details";
+import Error from "../pages/Error";
 
 
 
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
             path: "/details/:id",
             element: <Details></Details>
         },
+        {
+            path: "/*",
+            element: <Error></Error>
+        }
     ]
   },
 ]);

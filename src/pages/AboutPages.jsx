@@ -17,7 +17,7 @@ const AboutPages = () => {
       .then((data) => {
         setToys(data);
         setTimeout(() => {
-          setLoading(false); // 
+          setLoading(false); 
         }, 1000); 
       })
       .catch((error) => {

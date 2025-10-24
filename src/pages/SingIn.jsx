@@ -21,7 +21,7 @@ const SignIn = () => {
     setUser,
   } = useContext(AuthenticationContext);
 
-  // 🔹 Google Sign In
+  //  Google Sign In
   const handleGoogleSignIn = async () => {
     try {
       const res = await signInWithGoogleFunc();
@@ -111,7 +111,7 @@ const SignIn = () => {
     }
   };
 
-  // 🔹 Sign Out
+  //  Sign Out
   const handleSignOut = async () => {
     try {
       await signOutUserFunc();

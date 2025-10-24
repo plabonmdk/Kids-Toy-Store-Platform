@@ -16,7 +16,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setShowDropdown(false); // close dropdown immediately
+      setShowDropdown(false); 
       Swal.fire({
         icon: "success",
         title: "Logged out successfully!",

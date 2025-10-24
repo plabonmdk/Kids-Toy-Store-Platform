@@ -30,7 +30,7 @@ const ProfilePages = () => {
         photoURL: photoURL,
       });
 
-      // ✅ Refresh user info
+      //  Refresh user info
       await auth.currentUser.reload();
       const updatedUser = auth.currentUser;
       setUser(updatedUser);

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { Link } from "react-router";
 import Hero from "../Components/Hero";
-import { motion } from "framer-motion"; //  Import Framer Motion
+import { motion } from "framer-motion"; 
 import Loading from "../Components/Loading/Loading";
 
 const HomePages = () => {
   const [toys, setToys] = useState([]);
   const [expandedToys, setExpandedToys] = useState({});
-  const [loading, setLoading] = useState(true); // ✅ Loading state
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     fetch("/toyCollection.json")

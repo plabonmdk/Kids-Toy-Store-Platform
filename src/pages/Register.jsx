@@ -51,14 +51,14 @@ const Register = () => {
         photoURL: photo,
       });
 
-      // ✅ Skip email verification
+      
       Swal.fire({
         icon: "success",
         title: "Registration Successful!",
         html: `<b>Welcome, ${name}!</b>`,
         confirmButtonColor: "#4f46e5",
       }).then(() => {
-        navigate("/Sing_in"); // redirect to login page
+        navigate("/Sing_in"); 
       });
 
       form.reset();
