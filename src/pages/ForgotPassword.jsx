@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router"; // Fixed import
 import Swal from "sweetalert2";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { AuthenticationContext } from "../Context/AuthenticationContext";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const { endPassResetEmailFunc } = useContext(AuthenticationContext);
+  const { sendPassResetEmailFunc } = useContext(AuthenticationContext);
 
   const handleForgot = async (e) => {
     e.preventDefault();
@@ -22,7 +22,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      await endPassResetEmailFunc(email);
+      await sendPassResetEmailFunc(email); // make sure this returns a promise
       Swal.fire({
         icon: "success",
         title: "Password Reset Email Sent!",

@@ -1,14 +1,14 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-
+console.log(import.meta.env.VITE_apiKey)
 const firebaseConfig = {
-  apiKey: "AIzaSyCmncFQElAGyVAr59igPPmEcrPARx0OqOI",
-  authDomain: "kids-toy-store-platform.firebaseapp.com",
-  projectId: "kids-toy-store-platform",
-  storageBucket: "kids-toy-store-platform.firebasestorage.app",
-  messagingSenderId: "968965561015",
-  appId: "1:968965561015:web:5c841c0b19f43e083a8b32"
+  apiKey: import.meta.env.VITE_apiKey,
+  authDomain: import.meta.env.VITE_authDomain,
+  projectId:import.meta.env.VITE_projectId,
+  storageBucket: import.meta.env.VITE_storageBucket,
+  messagingSenderId:import.meta.env.VITE_messagingSenderId,
+  appId:import.meta.env.VITE_appId
 };
 
 
