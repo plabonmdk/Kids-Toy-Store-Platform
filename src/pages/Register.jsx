@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import bgImage from "../assets/colorful-toys-scattered-around-blue-background-with-space-middle-text_14117-608480.jpg";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { updateProfile } from "firebase/auth";
+import { updateProfile, signOut } from "firebase/auth";
 import Swal from "sweetalert2";
 import { AuthenticationContext } from "../Context/AuthenticationContext";
-
+import { auth } from "../firebase/FirebaseConfig"; 
 const Register = () => {
   const [show, setShow] = useState(false);
   const { createUserWithEmailAndPasswordFunc } = useContext(AuthenticationContext);
@@ -45,23 +45,31 @@ const Register = () => {
       const userCredential = await createUserWithEmailAndPasswordFunc(email, password);
       const user = userCredential.user;
 
-      // Update profile
+      //  Update profile
       await updateProfile(user, {
         displayName: name,
         photoURL: photo,
       });
 
-      
+      //  Immediately sign out the new user so they aren't logged in
+      await signOut(auth);
+
+      //  Success toast
       Swal.fire({
         icon: "success",
-        title: "Registration Successful!",
-        html: `<b>Welcome, ${name}!</b>`,
-        confirmButtonColor: "#4f46e5",
-      }).then(() => {
-        navigate("/Sing_in"); 
+        title: `Welcome, ${name}!`,
+        text: "Your account has been created successfully. Please sign in to continue.",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: "rgba(0,0,0,0.7)",
+        color: "#fff",
       });
 
       form.reset();
+      navigate("/sing_in"); 
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -73,12 +81,12 @@ const Register = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+      className="min-h-screen flex items-center justify-center relative bg-cover bg-center"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-black/20"></div>
 
-      <div className="relative z-10 w-full max-w-md bg-white/20 backdrop-blur-lg shadow-2xl rounded-2xl border border-white/30 p-8">
+      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-md shadow-2xl rounded-2xl border border-white/30 p-8">
         <h1 className="text-3xl font-bold text-center mb-2 text-white">
           Create an Account
         </h1>
@@ -152,7 +160,7 @@ const Register = () => {
         <p className="text-center text-sm text-gray-200 mt-5">
           Already have an account?{" "}
           <Link
-            to="/Sing_in"
+            to="/sing_in"
             className="link link-hover text-yellow-300 font-medium"
           >
             Login here

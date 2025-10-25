@@ -15,13 +15,12 @@ const Details = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true); 
+    setLoading(true);
     fetch("/toyCollection.json")
       .then((res) => res.json())
       .then((data) => {
         const foundToy = data.find((item) => item.toyId === parseInt(id));
 
-       
         setTimeout(() => {
           setToy(foundToy);
           setLoading(false);
@@ -33,7 +32,7 @@ const Details = () => {
       });
   }, [id]);
 
-  // Rating Function
+  //  Rating Function
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -45,7 +44,7 @@ const Details = () => {
     return stars;
   };
 
-  // Loading
+  //  Loading
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -54,7 +53,7 @@ const Details = () => {
     );
   }
 
-  // Not Found
+  //  Not Found
   if (!toy) {
     return (
       <motion.div
@@ -73,6 +72,7 @@ const Details = () => {
     );
   }
 
+  
   return (
     <motion.div
       className="max-w-6xl mx-auto px-6 py-10 mt-6 bg-white shadow-xl rounded-2xl"
@@ -81,36 +81,43 @@ const Details = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="grid md:grid-cols-2 gap-10 items-center">
-        {/* Image Section */}
+        {/*  Image Section with Smooth Hover Effect */}
         <motion.div
           className="flex justify-center"
           initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <img
+          <motion.img
             src={toy.pictureURL}
             alt={toy.toyName}
-            className="rounded-2xl w-full object-cover shadow-md"
+            className="rounded-2xl w-full object-cover shadow-md cursor-pointer transform transition-transform duration-500 ease-in-out"
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.25)",
+            }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           />
         </motion.div>
 
-        {/* Info Section */}
+        {/*  Info Section */}
         <motion.div
           initial={{ opacity: 0, x: 60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <h1 className="text-4xl font-bold text-gray-800 mb-3">{toy.toyName}</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-3">
+            {toy.toyName}
+          </h1>
           <p className="text-gray-500 text-lg mb-4">{toy.subCategory}</p>
 
-          {/* Rating */}
+          {/*  Rating */}
           <div className="flex items-center gap-2 mb-4">
             {renderStars(toy.rating)}
             <span className="text-gray-600 font-medium">{toy.rating}</span>
           </div>
 
-          {/* Price */}
+          {/*  Price */}
           <motion.p
             className="text-3xl font-semibold text-green-600 mb-4"
             initial={{ scale: 0.9, opacity: 0 }}
@@ -120,23 +127,26 @@ const Details = () => {
             Rs. {toy.price.toLocaleString()}
           </motion.p>
 
-          {/* Description */}
+          {/*  Description */}
           <p className="text-gray-700 leading-relaxed mb-6">{toy.description}</p>
 
-          {/* Seller Info */}
+          {/*  Seller Info */}
           <div className="space-y-2 text-gray-700 mb-8">
             <p>
-              <span className="font-semibold text-gray-900">Seller:</span> {toy.sellerName}
+              <span className="font-semibold text-gray-900">Seller:</span>{" "}
+              {toy.sellerName}
             </p>
             <p>
-              <span className="font-semibold text-gray-900">Email:</span> {toy.sellerEmail}
+              <span className="font-semibold text-gray-900">Email:</span>{" "}
+              {toy.sellerEmail}
             </p>
             <p>
-              <span className="font-semibold text-gray-900">Available:</span> {toy.availableQuantity} pcs
+              <span className="font-semibold text-gray-900">Available:</span>{" "}
+              {toy.availableQuantity} pcs
             </p>
           </div>
 
-          {/* Buttons */}
+          {/*  Buttons */}
           <motion.div
             className="flex flex-wrap gap-4"
             initial={{ opacity: 0, y: 20 }}

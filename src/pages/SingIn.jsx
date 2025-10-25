@@ -21,15 +21,21 @@ const SignIn = () => {
     setUser,
   } = useContext(AuthenticationContext);
 
-  //  Google Sign In
+  //  Google Sign In Fixed
   const handleGoogleSignIn = async () => {
     try {
       const res = await signInWithGoogleFunc();
-      setUser(res.user);
+      const signedUser = res.user;
+      setUser({
+        ...signedUser,
+        displayName: signedUser.displayName,
+        email: signedUser.email,
+        photoURL: signedUser.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png",
+      });
       Swal.fire({
         icon: "success",
         title: "Signed In with Google!",
-        text: `Welcome, ${res.user.displayName}`,
+        text: `Welcome, ${signedUser.displayName || "User"}`,
         confirmButtonColor: "#6366f1",
       });
       navigate(from, { replace: true });
@@ -43,15 +49,21 @@ const SignIn = () => {
     }
   };
 
-  //  Github Sign In
+  // GitHub Sign In
   const handleGithubSignIn = async () => {
     try {
       const res = await signInWithGithubFunc();
-      setUser(res.user);
+      const signedUser = res.user;
+      setUser({
+        ...signedUser,
+        displayName: signedUser.displayName,
+        email: signedUser.email,
+        photoURL: signedUser.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png",
+      });
       Swal.fire({
         icon: "success",
         title: "Signed In with GitHub!",
-        text: `Welcome, ${res.user.displayName || "User"}`,
+        text: `Welcome, ${signedUser.displayName || "User"}`,
         confirmButtonColor: "#6366f1",
       });
       navigate(from, { replace: true });
@@ -65,38 +77,26 @@ const SignIn = () => {
     }
   };
 
-  //  Email/Password Sign In (without verification)
+  // Email/Password Sign In
   const handleSignIn = async (e) => {
     e.preventDefault();
     const form = e.target;
     const emailValue = form.email.value.trim();
     const password = form.password.value;
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Weak Password",
-        html: `
-          Password must have:<br/>
-          • Minimum 8 characters<br/>
-          • 1 uppercase, 1 lowercase<br/>
-          • 1 number, 1 special character
-        `,
-        confirmButtonColor: "#f59e0b",
-      });
-      return;
-    }
-
     try {
       const res = await signInWithEmailAndPasswordFunc(emailValue, password);
-      setUser(res.user);
+      const signedUser = res.user;
+      setUser({
+        ...signedUser,
+        displayName: signedUser.displayName,
+        email: signedUser.email,
+        photoURL: signedUser.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png",
+      });
       Swal.fire({
         icon: "success",
         title: "Signed In!",
-        text: `Welcome back, ${res.user.email}`,
+        text: `Welcome back, ${signedUser.email}`,
         confirmButtonColor: "#6366f1",
       });
       form.reset();
@@ -111,7 +111,7 @@ const SignIn = () => {
     }
   };
 
-  //  Sign Out
+  // Sign Out
   const handleSignOut = async () => {
     try {
       await signOutUserFunc();
@@ -153,7 +153,7 @@ const SignIn = () => {
               Logged in as {user.email}
             </p>
 
-            {/*  Profile Image with fallback */}
+            {/*  Fixed Profile Image with fallback */}
             <img
               src={
                 user?.photoURL && user.photoURL !== ""
@@ -162,6 +162,7 @@ const SignIn = () => {
               }
               alt="User Avatar"
               className="mx-auto mt-3 w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
+              onError={(e) => (e.target.src = "https://i.ibb.co/4pDNDk1/avatar.png")}
             />
 
             <h2 className="text-xl font-semibold text-white">

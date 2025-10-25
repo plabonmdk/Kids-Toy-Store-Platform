@@ -10,7 +10,7 @@ import logo from "../assets/logo-toy-child-radio-controlled-car-product-png-favp
 
 const Navbar = () => {
   const { user, loading } = useContext(AuthenticationContext);
-  console.log(user)
+  
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleLogout = async () => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AuthenticationContext } from "./AuthenticationContext";
 import {
   createUserWithEmailAndPassword,
@@ -9,65 +9,41 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   updateProfile,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../firebase/FirebaseConfig";
 
-// Initialize providers
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); 
 
-  // Create user with email/password
-  const createUserWithEmailAndPasswordFunc = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false); 
+    });
 
-  // Update profile of the current user
-  const updateProfileFunc = (displayName, photoUrl) => {
-    if (!user) {
-      throw new Error("No user is currently logged in");
-    }
-    return updateProfile(user, { displayName, photoURL: photoUrl });
-  };
+    return () => unsubscribe();
+  }, []);
 
-  // Sign in with email/password
-  const signInWithEmailAndPasswordFunc = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  // Sign in with Google
-  const signInWithGoogleFunc = () => {
-    return signInWithPopup(auth, googleProvider);
-  };
-
-  // Sign in with GitHub
-  const signInWithGithubFunc = () => {
-    return signInWithPopup(auth, githubProvider);
-  };
-
-  // Sign out user
-  const signOutUserFunc = () => {
-    return signOut(auth);
-  };
-
-  // Send password reset email
-  const endPassResetEmailFunc = (email) => {
-    return sendPasswordResetEmail(auth, email);
-  };
-
-  // Export all functions via context
+  // All your auth functions...
   const authInfo = {
     user,
+    loading, // <-- provide loading to context
     setUser,
-    createUserWithEmailAndPasswordFunc,
-    signInWithEmailAndPasswordFunc,
-    signInWithGoogleFunc,
-    signInWithGithubFunc,
-    signOutUserFunc,
-    endPassResetEmailFunc,
-    updateProfileFunc,
+    createUserWithEmailAndPasswordFunc: (email, password) =>
+      createUserWithEmailAndPassword(auth, email, password),
+    signInWithEmailAndPasswordFunc: (email, password) =>
+      signInWithEmailAndPassword(auth, email, password),
+    signInWithGoogleFunc: () => signInWithPopup(auth, googleProvider),
+    signInWithGithubFunc: () => signInWithPopup(auth, githubProvider),
+    signOutUserFunc: () => signOut(auth),
+    sendPassResetEmailFunc: (email) => sendPasswordResetEmail(auth, email),
+    updateProfileFunc: (displayName, photoUrl) =>
+      user ? updateProfile(user, { displayName, photoURL: photoUrl }) : null,
   };
 
   return (

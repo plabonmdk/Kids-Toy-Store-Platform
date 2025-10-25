@@ -4,6 +4,8 @@ import { Link } from "react-router";
 import Hero from "../Components/Hero";
 import { motion } from "framer-motion"; 
 import Loading from "../Components/Loading/Loading";
+import KidsFAQ from "../Components/KidsFaq";
+import TestimonialsPage from "../Components/TestimonialsPage";
 
 const HomePages = () => {
   const [toys, setToys] = useState([]);
@@ -144,6 +146,8 @@ const HomePages = () => {
           </motion.div>
         )}
       </div>
+      <KidsFAQ></KidsFAQ>
+      <TestimonialsPage></TestimonialsPage>
     </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { auth } from "../firebase/FirebaseConfig";
 import { updateProfile } from "firebase/auth";
 import Swal from "sweetalert2";
+import { motion } from "framer-motion";
 
 const ProfilePages = () => {
   const [user, setUser] = useState(null);
@@ -30,17 +31,18 @@ const ProfilePages = () => {
         photoURL: photoURL,
       });
 
-      //  Refresh user info
-      await auth.currentUser.reload();
-      const updatedUser = auth.currentUser;
+      // Update user info instantly without reload
+      const updatedUser = {
+        ...user,
+        displayName: name,
+        photoURL: photoURL,
+      };
       setUser(updatedUser);
-      setName(updatedUser.displayName);
-      setPhotoURL(updatedUser.photoURL);
 
       Swal.fire(" Updated!", "Your profile has been updated successfully.", "success");
     } catch (error) {
       console.error("Profile update error:", error);
-      Swal.fire(" Error!", "Something went wrong.", "error");
+      Swal.fire(" Error!", "Something went wrong while updating.", "error");
     }
   };
 
@@ -53,19 +55,30 @@ const ProfilePages = () => {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded shadow mt-10">
-      <div className="flex flex-col items-center mb-6">
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="p-6 max-w-md mx-auto bg-white rounded shadow mt-15"
+    >
+      {/* Profile Info Section */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col items-center mb-6"
+      >
         <img
-          src={photoURL}
+          src={user.photoURL || "https://via.placeholder.com/150"}
           alt="Profile"
           className="w-24 h-24 rounded-full mb-3 border-2 border-gray-300 object-cover"
         />
         <h2 className="text-xl font-bold">{user.displayName || "No Name"}</h2>
         <p className="text-gray-600">{user.email}</p>
         <p className="text-sm text-gray-400 mt-1">Login with: {provider}</p>
-      </div>
+      </motion.div>
 
-      {/* Name */}
+      {/* Name Input */}
       <div className="mb-3">
         <label className="block mb-1 font-semibold">Name:</label>
         <input
@@ -76,7 +89,7 @@ const ProfilePages = () => {
         />
       </div>
 
-      {/* Email */}
+      {/* Email Display */}
       <div className="mb-3">
         <label className="block mb-1 font-semibold">Email:</label>
         <input
@@ -87,7 +100,7 @@ const ProfilePages = () => {
         />
       </div>
 
-      {/* Photo URL */}
+      {/* Photo URL Input */}
       <div className="mb-3">
         <label className="block mb-1 font-semibold">Profile Photo URL:</label>
         <input
@@ -99,13 +112,16 @@ const ProfilePages = () => {
         />
       </div>
 
-      <button
+      {/* Update Button */}
+      <motion.button
+        whileHover={{ scale: 1.05, backgroundColor: "#2563EB" }}
+        whileTap={{ scale: 0.95 }}
         onClick={handleUpdate}
         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full"
       >
         Update Profile
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 };
 
